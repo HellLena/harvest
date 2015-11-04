@@ -1,0 +1,27 @@
+%ul.nav.nav-tabs
+  %li.active
+    %a{:href => "#graph", "data-toggle" => "tab"} Graph
+  %li
+    %a{:href => "#table", "data-toggle" => "tab"} Table
+  .pull-right
+    = select_tag "switch", options_for_select(["sugar per days", "sugar per bees"], "sugar per days"), :class => "form-control"
+
+  .tab-content
+    #graph.tab-pane.fade.in.active
+    #table.tab-pane.fade
+      = render partial: 'tab_content', :locals => {:param => 'days'}
+
+:javascript
+
+  $(document).ready(function(){
+    $('#switch').on("change", function(){
+      var param = $(this).val();
+      var results = $('#table');
+      if(param == "sugar per days"){
+        results.html('#{escape_javascript render partial: 'tab_content', :locals => {:param => 'days'}}');
+      } else {
+        results.html('#{escape_javascript render partial: 'tab_content', :locals => {:param => 'bees'}}');
+      }
+
+    })
+  })

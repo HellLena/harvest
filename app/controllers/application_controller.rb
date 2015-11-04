@@ -9,8 +9,7 @@ class ApplicationController < ActionController::Base
   def index
 
     @group_by_pollen = {}
-    @group_by_day = {}
-    @group_by_bees = {}
+    @group_by_harvest = {'days' => {}, 'bees' => {}}
 
     csv_text = File.read('db/pollens.csv')
     csv = CSV.parse(csv_text, :headers => true)
@@ -38,17 +37,17 @@ class ApplicationController < ActionController::Base
       @group_by_pollen[pollen_id]['count'] += 1
 
       day = row['day']
-      @group_by_day[day] = 0 if @group_by_day[day].nil?
-      @group_by_day[day] += sugar
+      @group_by_harvest['days'][day] = 0 if @group_by_harvest['days'][day].nil?
+      @group_by_harvest['days'][day] += sugar
 
-      bee = row['bee_id']
-      @group_by_bees[bee] = 0 if @group_by_bees[bee].nil?
-      @group_by_bees[bee] += sugar
+      bee = row['bee_id'].to_i
+      @group_by_harvest['bees'][bee] = 0 if @group_by_harvest['bees'][bee].nil?
+      @group_by_harvest['bees'][bee] += sugar
     end
 
-    days = @group_by_day.length
-    @group_by_bees.each do |bee, sugar|
-      @group_by_bees[bee] = sugar/days
+    days = @group_by_harvest['days'].length
+    @group_by_harvest['bees'].each do |bee, sugar|
+      @group_by_harvest['bees'][bee] = sugar/days
     end
 
   end

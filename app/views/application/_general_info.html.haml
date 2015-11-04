@@ -1,0 +1,34 @@
+%p
+  The most effective pollen is:
+  %b
+    - pollen = @group_by_pollen.max_by{|k,v| v['sugar']}[1]
+    = pollen['name'] + " (sugar harvested: " + pollen['sugar'].to_s + ")"
+%p
+  The most popular pollen is:
+  %b
+    - pollen = @group_by_pollen.max_by{|k,v| v['count']}[1]
+    = pollen['name'] + " (times harvested: " + pollen['count'].to_s + ")"
+%p
+  The best day for harvest:
+  %b
+    - day = @group_by_harvest['days'].max_by{|k,v| v}
+    = day[0] + " (sugar harvested: " + day[1].to_s + ")"
+%p
+  The worst day for harvest:
+  %b
+    - day = @group_by_harvest['days'].min_by{|k,v| v}
+    = day[0] + " (sugar harvested: " + day[1].to_s + ")"
+%p
+  Total working days:
+  %b
+    = @group_by_harvest['days'].length
+%p
+  The best bee:
+  %b
+    - bee = @group_by_harvest['bees'].max_by{|k,v| v}
+    = bee[0].to_s + " (sugar harvested per day: " + bee[1].round(2).to_s + ")"
+%p
+  The worst bee:
+  %b
+    - bee = @group_by_harvest['bees'].min_by{|k,v| v}
+    = bee[0].to_s + " (sugar harvested per day: " + bee[1].round(2).to_s + ")"

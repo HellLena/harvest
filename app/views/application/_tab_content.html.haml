@@ -1,0 +1,135 @@
+%table.table.table-hover
+  %thead
+    %tr
+      %th= param.capitalize
+      %th= param == "days" ? "Total amount of sugar" : "Average amount of sugar"
+  %tbody
+    - best = @group_by_harvest[param].max_by{|k,v| v}[0]
+    - worst = @group_by_harvest[param].min_by{|k,v| v}[0]
+    - @group_by_harvest[param].sort.each do |key, sugar|
+      %tr{:class => key.eql?(best) ? "success" : (key.eql?(worst) ? "danger" : "")}
+        %td= key
+        - tag = key.eql?(best) ? " - the best result" : (key.eql?(worst) ? " - the worst result" : "")
+        %td= sugar.round(2).to_s + tag
+
+:javascript
+
+  $(document).ready(function(){
+    var doc_width = $(document).width();
+    var margin = {top: 30, right: 20, bottom: 35, left: 70},
+        width = doc_width >= 992 ? doc_width/2 - 20 - margin.left - margin.right : doc_width - 50 - margin.left - margin.right,
+        height = 270 - margin.top - margin.bottom;
+
+    var parseDate = d3.time.format("%Y-%m-%d").parse;
+    var param = '#{param}';
+
+    var x = param == "days" ? d3.time.scale().range([0, width]) : d3.scale.linear().range([0, width]);
+    var y = d3.scale.linear().range([height, 0]);
+
+    var xAxis = d3.svg.axis().scale(x)
+      .orient("bottom").ticks(5);
+
+    var yAxis = d3.svg.axis().scale(y)
+      .orient("left").ticks(5);
+
+    var valueline = d3.svg.line()
+      .x(function(d) { return x(d.key); })
+      .y(function(d) { return y(d.sugar); });
+
+    $("#graph").html('');
+    var svg = d3.select("#graph")
+      .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var group_by_param = JSON.parse('#{@group_by_harvest[param].to_json}');
+    var data = [];
+    for(var key in group_by_param){
+      data.push({ "key": param == "days" ? parseDate(key) : +key, "sugar": group_by_param[key] });
+    }
+    data.sort(function(a,b){ return a.key - b.key ;});
+
+    // Scale the range of the data
+    x.domain(d3.extent(data, function(d) { return d.key; }));
+    y.domain([0, d3.max(data, function(d) { return d.sugar; })]);
+
+    svg.append("path")      // Add the valueline path.
+      .attr("d", valueline(data));
+
+    // Add the text label for the X axis
+    svg.append("text")
+        .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.bottom - 5) + ")")
+        .style("text-anchor", "middle")
+        .text(function(){ return param == "days" ? "Days" : "Bees"; });
+
+    svg.append("g")         // Add the X Axis
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+    // Add the text label for the Y axis
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - margin.left)
+        .attr("x",0 - (height / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text(function(){ return param == "days" ? "Sugar(sum)" : "Sugar(avg)"; });
+
+    svg.append("g")         // Add the Y Axis
+      .attr("class", "y axis")
+      .call(yAxis);
+
+    // to find nearest date to current mouse position
+    var bisectDate = d3.bisector(function(d){ return d.key;}).left;
+
+    // create interactive focus
+    var focus = svg.append("g")
+                   .attr("class", "focus")
+                   .style("display", "none");
+
+    // add two circles to focus point
+    focus.append("circle")
+         .attr("r", 5.5);
+    focus.append("circle")
+         .attr("r", 2)
+         .style("fill", "steelBlue");
+
+    // rectangle to detect mouse events and focus visibility
+    var rect = svg.append("rect")
+                  .attr("class", "overlay")
+                  .attr("width", width)
+                  .attr("height", height)
+                  .on("mouseover", function(){ focus.style("display", null); })
+                  .on("mouseout", function(){ focus.style("display", "none"); $(this).parent().find(".focus").tooltip('hide'); })
+                  .on("mousemove", mousemove);
+
+    function mousemove() {
+      var x0 = x.invert(d3.mouse(this)[0]),
+          i = bisectDate(data, x0, 1),
+          d0 = data[i - 1],
+          d1 = data[i];
+      if(d0 && d1) {
+        var d = x0 - d0.key > d1.key - x0 ? d1 : d0;
+        focus.attr("transform", "translate(" + x(d.key) + "," + y(d.sugar) + ")");
+        var el = $(this).parent().find(".focus");
+        el.tooltip({
+            'container': 'body',
+            'placement': 'top',
+            'trigger': 'manual'
+        });
+        var text = "";
+        if(param == "days") {
+          text = "day: " + d.key.getDate() + "; sugar: " + parseFloat(d.sugar).toFixed(2);
+        } else {
+          text = "bee_id: " + d.key + "; sugar: " + parseFloat(d.sugar).toFixed(2)
+        }
+        el.attr('data-original-title', text )
+          .tooltip('fixTitle')
+          .tooltip('show');
+      }
+    }
+
+  })
