@@ -6,6 +6,7 @@ gem 'rails', '4.1.1'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.3'
 gem 'haml-rails', '>= 0.3.4', :group => :development
+gem 'remotipart', '~> 1.0'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
 # Use CoffeeScript for .js.coffee assets and views

@@ -18,6 +18,10 @@
     border-radius: 0px;
 }
 
+#visualization {
+    margin-bottom: 20px;
+}
+
 path {
     stroke: steelblue;
     stroke-width: 2;
@@ -41,4 +45,26 @@ path {
     fill: none;
     stroke: steelBlue;
     stroke-width: 1.5px;
+}
+
+.form-inline input[type="file"] {
+    display: inline-block;
+}
+
+#flash-messages {
+    display: none;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 1.0em;
+}
+
+.flash-success {
+    background-color: #28c94a;
+}
+
+.flash-error {
+    background-color: #ff783c;
 }

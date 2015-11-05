@@ -1,9 +1,11 @@
 = content_for :header do
   Bees Harvest
 
-.col-xs-12.col-md-6
+.col-xs-12.col-md-6#visualization
   = render partial: 'visualization'
 
-.col-xs-12.col-md-6
+.col-xs-12.col-md-6#general_info
   = render partial: 'general_info'
 
+.col-xs-12
+  = render partial: 'test_files'

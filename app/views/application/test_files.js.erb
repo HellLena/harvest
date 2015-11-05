@@ -1,0 +1,19 @@
+var file_error = JSON.parse('<%= @file_error.to_json %>');
+var flash_messages = $('#flash-messages');
+if($.isEmptyObject(file_error)) {
+    flash_messages.attr('class', 'flash-success').html("Build success.");
+    $('#general_info').html('<%= escape_javascript render partial: 'general_info' if @file_error.blank? %>');
+    $('#visualization').html('<%= escape_javascript render partial: 'visualization' if @file_error.blank? %>');
+} else {
+    if(!file_error['isPollenFile'] && !file_error['isHarvestFile']) {
+        flash_messages.html("Both files have wrong structure. Check your files.");
+    } else if(!file_error['isPollenFile']) {
+        flash_messages.html("Incorrect pollen file structure. Check your pollen file.");
+    } else if(!file_error['isHarvestFile']) {
+        flash_messages.html("Incorrect harvest file structure. Check your harvest file.");
+    }
+    flash_messages.attr('class', 'flash-error');
+}
+flash_messages.delay(100).fadeIn('normal', function() {
+    $(this).delay(3000).fadeOut();
+});

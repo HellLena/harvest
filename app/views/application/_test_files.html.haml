@@ -1,0 +1,10 @@
+%p
+  %b Test another .csv files with pollens and harvest data:
+  = form_tag({controller: 'application', action: 'test_files'}, method: "post", remote: true) do
+    .form-inline
+      %label pollens file:
+      = file_field_tag('pollens_file', multiple: false, :accept => "text/csv")
+    .form-inline
+      %label harvest file:
+      = file_field_tag('harvest_file', multiple: false, :accept => "text/csv")
+    = submit_tag 'Go!', class: 'btn btn-sm btn-primary'
