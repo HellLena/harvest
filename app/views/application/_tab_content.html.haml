@@ -1,16 +1,17 @@
-%table.table.table-hover
-  %thead
-    %tr
-      %th= param.capitalize
-      %th= param == "days" ? "Total amount of sugar" : "Average amount of sugar"
-  %tbody
-    - best = @group_by_harvest[param].max_by{|k,v| v}[0]
-    - worst = @group_by_harvest[param].min_by{|k,v| v}[0]
-    - @group_by_harvest[param].sort.each do |key, sugar|
-      %tr{:class => key.eql?(best) ? "success" : (key.eql?(worst) ? "danger" : "")}
-        %td= key
-        - tag = key.eql?(best) ? " - the best result" : (key.eql?(worst) ? " - the worst result" : "")
-        %td= sugar.round(2).to_s + tag
+.col-xs-12
+  %table.table.table-hover
+    %thead
+      %tr
+        %th= param.capitalize
+        %th= param == "days" ? "Total amount of sugar" : "Average amount of sugar"
+    %tbody
+      - best = @group_by_harvest[param].max_by{|k,v| v}[0]
+      - worst = @group_by_harvest[param].min_by{|k,v| v}[0]
+      - @group_by_harvest[param].sort.each do |key, sugar|
+        %tr{:class => key.eql?(best) ? "success" : (key.eql?(worst) ? "danger" : "")}
+          %td= key
+          - tag = key.eql?(best) ? " - the best result" : (key.eql?(worst) ? " - the worst result" : "")
+          %td= sugar.round(2).to_s + tag
 
 :javascript
 
